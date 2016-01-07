@@ -1,0 +1,52 @@
+<html ng-app="SteamApp">
+
+  <head>
+
+    <title>Frameless Window</title>
+
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+    <script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
+    <script type="text/javascript" src="index.js"></script>
+    <script type="text/javascript" src="optionsController.js"></script>
+  </head>
+
+  <body>
+
+    <div id="content" ng-controller="OptionsController">
+
+      <div id="inner-content">
+        Add account:<br/>
+        <label for="name">Name</label>
+        <input type="text" id="name" ng-model="name"><br />
+        <label for="secret">Secret</lavel>
+        <input type="text" id="secret" ng-model="secret">
+        <button id="addAccount" ng-click="addAccount()">Add</button>
+        <button id="Update" ng-click="update()">Update</button>
+        <br/>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                Name
+              </th>
+              <th>
+                Secret
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="account in accounts">
+              <td>{{ account.name }}</td>
+              <td>{{ account.secret }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+
+      </div>
+
+    </div>
+
+  </body>
+
+</html>
