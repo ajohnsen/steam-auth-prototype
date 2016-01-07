@@ -6,9 +6,8 @@ var BrowserWindow = require('browser-window');
 var dialog = require('dialog');
 var clipboard = require('clipboard');
 var SteamTotp = require('steam-totp');
-var smalltalk = require('smalltalk');
 
-var iconPath = path.join(__dirname, 'icon.png');
+var iconPath = path.join(__dirname, 'key_icon.png');
 var appIcon = null;
 var win = null;
 

@@ -1,13 +1,14 @@
 var app = require('app');
 var Tray = require('tray');
 var Menu = require('menu');
-var MenuItem = require('menu-item');
 var path = require('path');
 var BrowserWindow = require('browser-window');
+var dialog = require('dialog');
 var clipboard = require('clipboard');
 var SteamTotp = require('steam-totp');
+var smalltalk = require('smalltalk');
 
-var iconPath = path.join(__dirname, 'key_icon.png');
+var iconPath = path.join(__dirname, 'icon.png');
 var appIcon = null;
 var win = null;
 
@@ -18,6 +19,7 @@ const pkg = require('./package.json');
 // package name and optionally some default values
 const conf = new Configstore(pkg.name, {foo: 'bar'});
 
+conf.set("accounts", []);
 require('crash-reporter').start({companyName: 'Test'});
 app.on('ready', function(){
   win = new BrowserWindow({show: false});
@@ -27,19 +29,6 @@ app.on('ready', function(){
 
   })
 
-  SteamTotp.getTimeOffset(function (error, time, latency) {
-    console.log("Steam error: " + error);
-    console.log("Steam offset: " + time);
-    console.log("Steam latency: " + latency);
-    SteamTotp.time(time);
-  });
-
-  var copyAuthToClipboard = function(secret) {
-    var authCode = SteamTotp.getAuthCode(secret)
-    console.log(secret);
-    console.log(authCode);
-    clipboard.writeText(authCode);
-  }
   var updateContextMenu = function() {
     var text = "Account1: "+ SteamTotp.getAuthCode('GHEheuagwhawagwaG') +"\nAccount2: "+ SteamTotp.getAuthCode('GHEheuagwhawGG');
     appIcon.setToolTip(text);
@@ -48,43 +37,33 @@ app.on('ready', function(){
       accounts = [];
     }
     console.log(accounts);
-    var menu = new Menu();
-
-    accounts.forEach(function(account) {
-      menu.append(new MenuItem(
-        {
-          label: account.name,
-          click: function() {
-            var authCode = SteamTotp.getAuthCode(account.secret);
-            console.log(account);
-            console.log(authCode);
-            clipboard.writeText(authCode)
-          }
-        }));
-    })
-
-    menu.append(new MenuItem({
+    var menu = [];
+    for(var i = 0; i < accounts.length; i++) {
+      var account = accounts[i];
+      menu.push({ label: account.name, click: function() { clipboard.writeText(SteamTotp.getAuthCode(account.secret))}});
+    }
+    menu.push({
                 type: 'separator'
-            }));
+            })
 
-    var updateButton = new MenuItem({
+    var updateButton = {
       label: 'Update',
       click: function() {
         appIcon.setContextMenu(updateContextMenu());
         optionWindow.show();
       }
-    })
-    menu.append(updateButton);
+    }
+    menu.push(updateButton);
 
-    var quitButton = new MenuItem({
+    var quitButton = {
       label: 'Quit',
       selector: 'terminate:',
-    })
+    }
 
-    menu.append(quitButton);
-    console.log("MENU")
+    menu.push(quitButton);
     console.log(menu);
-    return menu;
+
+    return Menu.buildFromTemplate(menu);
   }
 
 
